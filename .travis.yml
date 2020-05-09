@@ -1,0 +1,17 @@
+sudo: required
+distro: xenial
+language: python
+python:
+- '3.6'
+- '3.7'
+- '3.8'
+install: pip install -r requirements.txt
+before_script: cd tests/
+script: python3 test.py
+after_script: cd ~
+deploy:
+  provider: pypi
+  user: __token__
+  password:
+    secure: T4nZhZk82XfnfUCb2Baiav7nDe4TbAnhmxFHWHfJtw2BIDoT2DuTjdELTwMPIRBWEUJdHtrTdhkWCHct1XGtNXUffr5kGVXewFyuHH/Dz3xfTEexv+JsPi5+dScUcAJ5PhBmM4vXVw1noX5SY5xWpllecGjIeMQwePqf3YEXP9O5bfKYIE1rleXcBJQb9aQjMDpaNVNceauH6RAQmtzS7FpAQHmi3yA1ouPcZhRpICVTMKaOvlK2ru8RcFsWtqYDFNAfNalUHsLaweLOAqDpoFTa8wQutRiOMP9+kQyBnJ9wz0s9N/MWdZ35PHBKnlbJmoBbSIrOuKnp00SFiycT69w5cZZjce7FeT8N+cqwBjVQIok6EexoO5ochETLoMIf7Fmy7glQn3nzBut2nVuaB1V3p78S0Sda49rlRPtU65ILKXNqIVd6tmlJEVVfFGXs9GQ0Oxgw+3l7WGy2yeHZI5gW/IAvqbOmZnTVIN+aRSEXICdq/nWws8rR4+F1hUPV8IEmNcz2IONlFimXXHxFhwQ33sSeDYr8SSsetPKqtf+ea2/KQA5G7MTbGFFePqknC3CKxidu5c3K/h0nxP1eGN4gvPtYQwSPqXt5RcsE8cdkpLuylYSCx4iko+2y9gR+s7khJBaLuKpvlZDMDm1DG2m7jPSFgUkJ3NmV74muapE=
+  skip_existing: true

@@ -15,8 +15,8 @@ import argparse
 class StockTracker:
     def __init__(self, configFile="config.yml"): 
         self.config = dict()
+        self.configFile = configFile
         self.stocks = dict()
-        self.LOG = self.setupLog()
         self.LOG_LEVELS =  {'debug': logging.DEBUG,
           'info': logging.INFO,
           'warning': logging.WARNING,
@@ -24,7 +24,12 @@ class StockTracker:
           'critical': logging.CRITICAL}
         self.slackAlerts = list()
         self.snsAlerts = list()
-        self.setupConfig(configFile)
+        self.setup()
+
+    def setup(self):
+        
+        self.setupLog(logging.WARN)
+        self.setupConfig(self.configFile)
         self.LOG.debug("app config: " + str(self.config))
 
     def askYahoo(self, symbol):
@@ -61,63 +66,73 @@ class StockTracker:
         @param symbol string of stock symbol
         @return the current stock price
         """
-        lookupType = self.stocks[symbol]['Type']
-        if lookupType == "yahoo":
-            return self.askYahoo(symbol)
-        elif lookupType == "bitstamp":
-            return self.askBitstamp(symbol)
-        else:
-            self.LOG.critical("Symbol " + str(symbol) + " has no defined stock type!")
+        try:
+            lookupType = self.stocks[symbol]['Type']
+            if lookupType == "yahoo":
+                return self.askYahoo(symbol)
+            elif lookupType == "bitstamp":
+                return self.askBitstamp(symbol)
+            else:
+                self.LOG.critical("Symbol " + str(symbol) + " has no defined stock type!")
+                return 0.00
+        except KeyError as e:
+            self.LOG.error("Looked up stock for invalid symbol: " + symbol + " | " + str(e))
             return 0.00
-    
 
     def sendSNSAlert(self, msg):
-        client = boto3.client('sns','us-east-1')
         if self.snsAlerts != None:
+            client = boto3.client('sns','us-east-1')
             for PHONE_NUM in self.snsAlerts:
                 self.LOG.info('Sending SNS Alert to ' + str(PHONE_NUM))
                 client.publish(PhoneNumber=PHONE_NUM, Message=msg)
 
     def sendSlackAlert(self, msg):
-        for alert in self.slackAlerts:
-            self.LOG.info("Sending slack alert to: " + str(alert['Endpoint']))
-            slackClient = WebClient(token=alert['BotToken'])
-            endpoint = alert['Endpoint']       
-            try:
-                response = slackClient.chat_postMessage(channel=endpoint,text=msg)
-            except SlackApiError as e:
-                self.LOG.error("Slack API Error: " + str(e))
-                
+        if self.slackAlerts != None:
+            for alert in self.slackAlerts:
+                self.LOG.info("Sending slack alert to: " + str(alert['Endpoint']))
+                slackClient = WebClient(token=alert['BotToken'])
+                endpoint = alert['Endpoint']       
+                try:
+                    response = slackClient.chat_postMessage(channel=endpoint,text=msg)
+                except SlackApiError as e:
+                    self.LOG.error("Slack API Error: " + str(e))
+                    
 
-    def setupLog(self, logLevel=logging.DEBUG): # TBC Change default to INFO
+    def setupLog(self, logLevel=logging.INFO):
         """ 
         Sets up logging.
         @param level The logger level you wish to set, DEBUG by default
         @return The logging object you need to log stuffs
         """        
-        log = logging.getLogger(__name__)
-        log.setLevel(logLevel) 
+        self.LOG = logging.getLogger("StockTracker")
+        self.LOG.setLevel(logLevel) 
         ch = logging.StreamHandler()
         ch.setLevel(logLevel)
         formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
         ch.setFormatter(formatter)
         fh = logging.FileHandler("stockTracker.log")
         fh.setLevel(logLevel)
-        log.addHandler(ch)
-        log.addHandler(fh)
-        coloredlogs.install(level=logLevel, logger=log)
-        return log
+        self.LOG.addHandler(ch)
+        self.LOG.addHandler(fh)
+        coloredlogs.install(level=logLevel, logger=self.LOG)
+        
 
     def setupConfig(self, fileName="config.yml"):
         
-        with open(fileName, 'r') as stream:
-            try:
-                self.config = yaml.safe_load(stream)['stockTracker']
-            except yaml.YAMLError as ex:
-                self.LOG.error("Error loading config file.  YAML may be improperly formatted: " + str(ex))
-            except IOError as ex:
-                self.LOG.error("Error loading config file.  File may not exist. " + str(ex)) 
- 
+        try:
+            with open(fileName, 'r') as stream:
+                try:
+                    self.config = yaml.safe_load(stream)['stockTracker']
+                except yaml.YAMLError as ex:
+                    self.LOG.error("Error loading config file.  YAML may be improperly formatted: " + str(ex))
+                    sys.exit(1) 
+        except FileNotFoundError as ex:
+            self.LOG.error("Error loading config file.  File may not exist. " + str(ex))
+            sys.exit(1) 
+        except IOError as ex:
+            self.LOG.error("Error loading config file.  File may not exist. " + str(ex))     
+            sys.exit(1) 
+            
         appConfig = self.config['ApplicationConfig']
         self.slackAlerts = list() # [ { 'webhookURL': '', 'endpoint': ''  }, ... ]
         self.snsAlerts = list() # [ phoneNumber, phoneNumber, ... ]
@@ -137,8 +152,10 @@ class StockTracker:
                 self.LOG.info("Setting log level from config file")
                 newLogLevel = appConfig[configObject].lower()
                 newLogLevel = self.LOG_LEVELS[newLogLevel]
-                self.LOG.setLevel( newLogLevel )
-                
+                self.LOG.setLevel(newLogLevel)
+                for handler in self.LOG.handlers:
+                    handler.setLevel(newLogLevel)
+
             else:
                 print("Skipping an invalid configuration node in ApplicationConfig object")
 
@@ -178,11 +195,13 @@ class StockTracker:
                 self.sendSlackAlert( message )
                 self.LOG.warning( message )
 
+        return True
+        
 def main():
     parser = argparse.ArgumentParser(description="Tracks stock prices!")
     parser.add_argument('--config', help="defines an alertnate configuration file.  Default is config.yml", type=str)
     parser.add_argument('--sleep', help="amount of seconds to sleep between loops, if `--loop` is enabled.", type=int)
-    parser.add_argument('--loop', help="causes the program to stay in an infinite loop.  requires a `--sleep` parameter", action="store_true")
+    parser.add_argument('--loop', help="causes the program to stay in an infinite loop.  Should be coupled with a --sleep parameter for optimal efficiency.", action="store_true")
     
     args = parser.parse_args()
 
