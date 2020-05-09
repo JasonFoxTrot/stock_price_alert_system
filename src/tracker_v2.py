@@ -110,14 +110,20 @@ class StockTracker:
 
     def setupConfig(self, fileName="config.yml"):
         
-        with open(fileName, 'r') as stream:
-            try:
-                self.config = yaml.safe_load(stream)['stockTracker']
-            except yaml.YAMLError as ex:
-                self.LOG.error("Error loading config file.  YAML may be improperly formatted: " + str(ex))
-            except IOError as ex:
-                self.LOG.error("Error loading config file.  File may not exist. " + str(ex)) 
- 
+        try:
+            with open(fileName, 'r') as stream:
+                try:
+                    self.config = yaml.safe_load(stream)['stockTracker']
+                except yaml.YAMLError as ex:
+                    self.LOG.error("Error loading config file.  YAML may be improperly formatted: " + str(ex))
+                    sys.exit(1) 
+        except FileNotFoundError as ex:
+            self.LOG.error("Error loading config file.  File may not exist. " + str(ex))
+            sys.exit(1) 
+        except IOError as ex:
+            self.LOG.error("Error loading config file.  File may not exist. " + str(ex))     
+            sys.exit(1) 
+            
         appConfig = self.config['ApplicationConfig']
         self.slackAlerts = list() # [ { 'webhookURL': '', 'endpoint': ''  }, ... ]
         self.snsAlerts = list() # [ phoneNumber, phoneNumber, ... ]
@@ -182,7 +188,7 @@ def main():
     parser = argparse.ArgumentParser(description="Tracks stock prices!")
     parser.add_argument('--config', help="defines an alertnate configuration file.  Default is config.yml", type=str)
     parser.add_argument('--sleep', help="amount of seconds to sleep between loops, if `--loop` is enabled.", type=int)
-    parser.add_argument('--loop', help="causes the program to stay in an infinite loop.  requires a `--sleep` parameter", action="store_true")
+    parser.add_argument('--loop', help="causes the program to stay in an infinite loop.  Should be coupled with a --sleep parameter for optimal efficiency.", action="store_true")
     
     args = parser.parse_args()
 

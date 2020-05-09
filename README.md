@@ -1,6 +1,12 @@
-# stock_price_alert_system
+# stock-price-alerts
 
 A script that can send alerts when a stock prices crosses a given threshold.
+
+# Installation
+1. `pip3 install stock-price-alerts`
+2. Copy `src/config_example.yml` to your machine
+3. Modify config_example.yml to your liking, rename it to what you wish.  See [Configuration]
+4. `stock-price-alerts --config /path/to/your/config.yml`
 
 # Configuration
 In `config_example.yml`, you can see a skeleton configuration.
@@ -39,13 +45,7 @@ If your `Endpoint` is a USER, you must feed the Slack Member ID, see here: `http
 If your `Endpoint` is a channel, get the channel ID from your browser as discussed here: `https://www.wikihow.com/Find-a-Channel-ID-on-Slack-on-PC-or-Mac`
 
 # Requirements
-## Functional in Python 3.6.9
-
-Install w/ pip: `pip3 install -r requirements.txt`
-
-# Execution
-
-`python tracker_v2.py`
+* Python >=3.6
 
 # Optional Parameters
 
@@ -55,6 +55,8 @@ Install w/ pip: `pip3 install -r requirements.txt`
 
 `--loop` causes the program to stay in an infinite loop.  requires a `--sleep` parameter
 
-## Example
+## Example Usage
 
-`python tracker_v2.py --loop --sleep 3600` to sleep 30 minutes between checks.
+`stock-price-alerts --help`
+`stock-price-alerts --config /home/alex/stock-price-alerts.yml`
+`stock-price-alerts --loop --sleep 3600` to sleep 30 minutes between checks.
