@@ -8,7 +8,7 @@ python:
 install: pip install -r requirements.txt
 before_script: cd tests/
 script: python3 test.py
-after_script: cd ~
+after_script: cd $TRAVIS_BUILD_DIR
 deploy:
   provider: pypi
   user: __token__
