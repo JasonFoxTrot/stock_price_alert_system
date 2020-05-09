@@ -59,5 +59,7 @@ If your `Endpoint` is a channel, get the channel ID from your browser as discuss
 ## Example Usage
 
 `stock-price-alerts --help`
+
 `stock-price-alerts --config /home/alex/stock-price-alerts.yml`
+
 `stock-price-alerts --loop --sleep 3600` to sleep 30 minutes between checks.
