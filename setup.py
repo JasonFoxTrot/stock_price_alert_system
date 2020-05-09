@@ -16,7 +16,8 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/alex4108/stock_price_alert_system",
-    packages=setuptools.find_packages(),
+    package_dir={'': 'src'},
+    packages=setuptools.find_packages(where="src"),
     entry_points ={ 
         'console_scripts': [ 
             'stock-price-alerts = src.tracker_v2:main'

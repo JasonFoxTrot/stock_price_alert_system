@@ -6,9 +6,7 @@ python:
 - '3.7'
 - '3.8'
 install: pip install -r requirements.txt
-before_script: cd tests/
-script: python3 test.py
-after_script: cd $TRAVIS_BUILD_DIR
+script: ./build.sh
 deploy:
   provider: pypi
   user: __token__
