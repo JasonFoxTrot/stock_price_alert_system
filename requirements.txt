@@ -26,4 +26,4 @@ slackclient==2.5.0
 typing-extensions==3.7.4.2
 urllib3==1.25.9
 yarl==1.4.2
-yfinance==0.1.54
+git+git://github.com/alex4108/yfinance.git@master#egg=yfinance
