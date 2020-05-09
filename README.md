@@ -4,7 +4,7 @@
 A script that can send alerts when a stock prices crosses a given threshold.
 
 # Installation
-1. `pip3 install stock-price-alerts`
+1. `pip install stock-price-alerts`
 2. Copy `src/config_example.yml` to your machine
 3. Modify config_example.yml to your liking, rename it to what you wish.  See [Configuration]
 4. `stock-price-alerts --config /path/to/your/config.yml`
