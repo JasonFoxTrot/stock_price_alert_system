@@ -6,7 +6,7 @@ dist/*
 *.log
 
 # confidential
-*config.yml*
+src/config.yml
 
 #PyCharm
 .idea/
