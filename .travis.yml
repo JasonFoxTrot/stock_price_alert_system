@@ -1,15 +1,15 @@
-sudo: required
-distro: xenial
+os: linux
+dist: xenial
 language: python
 python:
 - '3.6'
 - '3.7'
 - '3.8'
 install: pip install -r requirements.txt
-script: "./build.sh"
+script: ./build.sh
 deploy:
   provider: pypi
-  user: __token__
+  username: __token__
   password:
     secure: h9PfRCIlKglAFVNN/5AQF8IaiYK1PESCzy6/Bfq/JbQiBJ4kq4CeNMLt3deLOFDHSuCRyd2Nvcog3njZjPJQcFOOnu8B2CPcD/iQX+5V4Ch5S3VHufqrCJ89S9VhKGDLvWdhKrbf4uRDc0DuQpDZ0i9+HmglQiQjAKiswAcylBQI45FI4tJzGdNOGWuGDm6uUbaF3tKBfzsaolJhIX2ny4tR9FDHoQfFMpWz2BxFGzWao6yUQUFqHL1G79FjijrPEwT1Pg/BqxKNwr3SlgyOnW+gg06HEqlGy1wjmuSTZhGGR6WaCcN34diYvjnvO9rbd7SY4ZhlRtiGFPyhPbCD1wdOM+oGdwiv8N3gHRJiyjoCdj7NUJScKQvjpLweWeZkR+m79GDOV6p2RZOrKW1JOw8++Xaug1if/cXTkH1myaBv3laeZIIa0uSfRGiB+iCvOu/GIl/lGT6HthnkVY7rhKqyuU3lQURHcoZFETp5BJkfV212uM0HkGXs+aFZwQ0d2nGfjvGdqtvcGRn7rp/LL8/BTbD/mz1Jsp+RmUAPKqRAEvaevSLPB0uXPLM8hLlfEP5UWCKVVUI66+FWszggNNOgA8d0adPIq7NEnOq2jgtX/1yyDfSdm31vbF1F8/OZWtD2kVDuH5lh47Emmy6o3KnlxL6QTLCwNyccsH3B044=
   skip_existing: true
