@@ -1,4 +1,5 @@
 # stock-price-alerts
+[![Build Status](https://travis-ci.com/alex4108/stock_price_alert_system.svg?branch=master)](https://travis-ci.com/alex4108/stock_price_alert_system)
 
 A script that can send alerts when a stock prices crosses a given threshold.
 
